@@ -1,0 +1,8 @@
+# AI Assistant - Requirements
+# Core: tkinter is built-in to Python (no install needed)
+
+# Optional: for Linux/Mac idle detection
+# pynput>=1.7.6
+
+# For building executable (optional)
+# pyinstaller>=6.0
