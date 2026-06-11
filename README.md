@@ -23,6 +23,6 @@ ai-assistant/
 For Build .EXE
 ```bash
 pip install pyinstaller
-pyinstaller --onefile --windowed --name "AI-Assistant" main.py
+pyinstaller --onefile --windowed --name "Personal-Advice" main.py
 ```
 

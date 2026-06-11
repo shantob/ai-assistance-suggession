@@ -98,11 +98,12 @@ class NotificationToast:
         head.children[list(head.children)[-1]].bind("<Button-1>", lambda e: self.dismiss())
 
         # Message
-        lines = message[:120] + ("…" if len(message) > 120 else "")
+        # Use self.msg instead of message
+        lines = self.msg[:120] + ("…" if len(self.msg) > 120 else "") 
         tk.Label(inner, text=lines,
-                 bg=C["notif_bg"], fg=C["notif_text"],
-                 font=("Segoe UI", 9),
-                 wraplength=260, justify="left").pack(anchor="w", pady=(2, 0))
+                bg=C["notif_bg"], fg=C["notif_text"],
+                font=("Segoe UI", 9),
+                wraplength=260, justify="left").pack(anchor="w", pady=(2, 0))
 
         # Click whole window opens chat
         for widget in [outer, inner, bar]:
@@ -297,74 +298,18 @@ class MessengerUI:
         main = tk.Frame(self.root, bg=C["bg"])
         main.pack(fill="both", expand=True)
 
-        # ── Header ──────────────────────────────────────────────────────────
+        # ── 1. Header (Top) ──────────────────
         header = tk.Frame(main, bg=C["primary"], height=55)
-        header.pack(fill="x")
+        header.pack(fill="x", side="top") # Ensure side is top
         header.pack_propagate(False)
+        # ... (keep all your existing header internal code here) ...
 
-        # Avatar circle
-        av = tk.Label(header, text="🤖", bg=C["secondary"],
-                      font=("Segoe UI", 16), width=2)
-        av.pack(side="left", padx=(10, 6), pady=8)
-
-        # Title block
-        title_frame = tk.Frame(header, bg=C["primary"])
-        title_frame.pack(side="left", fill="y", pady=6)
-        tk.Label(title_frame, text=SETTINGS["app_name"],
-                 bg=C["primary"], fg="white",
-                 font=("Segoe UI", 10, "bold")).pack(anchor="w")
-
-        self._status_lbl = tk.Label(title_frame, text="● Active",
-                                    bg=C["primary"], fg=C["accent"],
-                                    font=("Segoe UI", 8))
-        self._status_lbl.pack(anchor="w")
-
-        # Header buttons (right side)
-        btn_frame = tk.Frame(header, bg=C["primary"])
-        btn_frame.pack(side="right", padx=6)
-
-        # Minimise to icon
-        self._hdr_btn(btn_frame, "─", self.minimize, tip="Minimise")
-        # Hide (system tray style)
-        self._hdr_btn(btn_frame, "👁", self.hide_window, tip="Hide")
-        # Close app
-        self._hdr_btn(btn_frame, "✕", self._confirm_close, tip="Close")
-
-        # ── Scrollable Chat Area ─────────────────────────────────────────────
-        chat_container = tk.Frame(main, bg=C["bg"])
-        chat_container.pack(fill="both", expand=True)
-
-        self.canvas = tk.Canvas(chat_container, bg=C["bg"],
-                                highlightthickness=0)
-        self.msg_frame = tk.Frame(self.canvas, bg=C["bg"])
-        scrollbar = tk.Scrollbar(chat_container, orient="vertical",
-                                 command=self.canvas.yview,
-                                 troughcolor=C["bg"], bg=C["secondary"])
-
-        self.canvas.configure(yscroommand=scrollbar.set)
-        scrollbar.pack(side="right", fill="y")
-        self.canvas.pack(fill="both", expand=True)
-        self._canvas_window = self.canvas.create_window(
-            (0, 0), window=self.msg_frame, anchor="nw"
-        )
-
-        self.canvas.bind("<Configure>", self._on_canvas_resize)
-        self.msg_frame.bind("<Configure>", self._on_frame_configure)
-
-        # Mouse wheel scroll
-        self.canvas.bind_all("<MouseWheel>",
-                             lambda e: self.canvas.yview_scroll(-1 * (e.delta // 120), "units"))
-
-        # ── Quick Reply Buttons ──────────────────────────────────────────────
-        self._quick_frame = tk.Frame(main, bg=C["bg"])
-        self._quick_frame.pack(fill="x", padx=10, pady=(0, 4))
-        self._build_quick_replies()
-
-        # ── Footer / Input ───────────────────────────────────────────────────
+        # ── 2. Footer / Input (Bottom) ───────
+        # MOVE THIS BLOCK ABOVE THE CHAT CONTAINER
         footer = tk.Frame(main, bg="#F0F0F0", pady=6, padx=8)
-        footer.pack(fill="x", side="bottom")
+        footer.pack(fill="x", side="bottom") # Pack this first on the bottom
 
-        # Shutdown button (left of input)
+        # Shutdown button (inside footer)
         tk.Button(footer, text="🔴",
                   bg="#F0F0F0", fg=C["red"],
                   font=("Segoe UI", 12), bd=0, cursor="hand2",
@@ -375,8 +320,7 @@ class MessengerUI:
         self.entry = tk.Entry(footer, bg=C["input_bg"], fg=C["text_dark"],
                               font=("Segoe UI", 10), bd=1, relief="flat",
                               insertbackground=C["text_dark"])
-        self.entry.pack(side="left", fill="x", expand=True,
-                        ipady=6, padx=(0, 6))
+        self.entry.pack(side="left", fill="x", expand=True, ipady=6, padx=(0, 6))
         self.entry.bind("<Return>", lambda e: self.send())
 
         # Send button
@@ -387,7 +331,30 @@ class MessengerUI:
                   command=self.send,
                   activebackground=C["secondary"]).pack(side="right")
 
-        # ── Replay history ───────────────────────────────────────────────────
+        # ── 3. Quick Reply Buttons ──────────
+        self._quick_frame = tk.Frame(main, bg=C["bg"])
+        self._quick_frame.pack(fill="x", side="bottom", padx=10, pady=(0, 4))
+        self._build_quick_replies()
+
+        # ── 4. Scrollable Chat Area (Middle) ──
+        # Pack this LAST with expand=True to fill the remaining space
+        chat_container = tk.Frame(main, bg=C["bg"])
+        chat_container.pack(fill="both", expand=True)
+
+        self.canvas = tk.Canvas(chat_container, bg=C["bg"], highlightthickness=0)
+        self.msg_frame = tk.Frame(self.canvas, bg=C["bg"])
+        scrollbar = tk.Scrollbar(chat_container, orient="vertical", command=self.canvas.yview)
+
+        self.canvas.configure(yscrollcommand=scrollbar.set) # FIXED TYPO HERE
+        scrollbar.pack(side="right", fill="y")
+        self.canvas.pack(fill="both", expand=True)
+        self._canvas_window = self.canvas.create_window((0, 0), window=self.msg_frame, anchor="nw")
+
+        self.canvas.bind("<Configure>", self._on_canvas_resize)
+        self.msg_frame.bind("<Configure>", self._on_frame_configure)
+        self.canvas.bind_all("<MouseWheel>", lambda e: self.canvas.yview_scroll(-1 * (e.delta // 120), "units"))
+
+        # ── 5. Replay history ───────────────
         for role, text, ts in self.messages:
             if role == "AI":
                 self._add_bot_bubble(text, ts, replay=True)
@@ -395,7 +362,6 @@ class MessengerUI:
                 self._add_user_bubble(text, ts, replay=True)
 
         self.root.after(100, self._scroll_bottom)
-
     def _hdr_btn(self, parent, text, cmd, tip=""):
         b = tk.Button(parent, text=text,
                       bg=C["primary"], fg="white",
