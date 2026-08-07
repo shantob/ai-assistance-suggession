@@ -266,6 +266,8 @@ class MessengerUI:
             command=self.open_chat
         )
         self._icon_btn.pack(fill="both", expand=True)
+        # Right-click the floating icon to fully exit the assistant
+        self._icon_btn.bind("<Button-3>", lambda e: self._confirm_close())
 
         self._badge_lbl = tk.Label(
             self.root, bg=C["red"], fg="white",
@@ -302,7 +304,33 @@ class MessengerUI:
         header = tk.Frame(main, bg=C["primary"], height=55)
         header.pack(fill="x", side="top") # Ensure side is top
         header.pack_propagate(False)
-        # ... (keep all your existing header internal code here) ...
+
+        # Avatar + title + live status
+        left = tk.Frame(header, bg=C["primary"])
+        left.pack(side="left", fill="y", padx=(12, 0))
+
+        tk.Label(left, text="🤖", bg=C["primary"], fg="white",
+                 font=("Segoe UI", 18)).pack(side="left", padx=(0, 8))
+
+        title_box = tk.Frame(left, bg=C["primary"])
+        title_box.pack(side="left")
+
+        tk.Label(title_box, text=SETTINGS["app_name"],
+                 bg=C["primary"], fg="white",
+                 font=("Segoe UI", 11, "bold")).pack(anchor="w", pady=(10, 0))
+
+        self._status_lbl = tk.Label(title_box, text="● Active",
+                                     bg=C["primary"], fg=C["accent"],
+                                     font=("Segoe UI", 8))
+        self._status_lbl.pack(anchor="w")
+        self._update_status_label()
+
+        # Window controls: minimize (─) and close (✕ → shrink to floating icon)
+        controls = tk.Frame(header, bg=C["primary"])
+        controls.pack(side="right", padx=(0, 8))
+
+        self._hdr_btn(controls, "─", self.minimize, "Minimize")
+        self._hdr_btn(controls, "✕", self.minimize, "Close to icon")
 
         # ── 2. Footer / Input (Bottom) ───────
         # MOVE THIS BLOCK ABOVE THE CHAT CONTAINER

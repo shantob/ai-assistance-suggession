@@ -5,6 +5,12 @@ SETTINGS = {
     "notification_duration": 6000,  # ms to show notification popup
     "app_name": "PERSONAL ADVICE",
     "version": "2.0",
+
+    # ── Decision Engine tuning ───────────────────────────────────────────
+    # Minimum score a category must reach (out of the matched keyword
+    # weights) before the engine commits to that category. Lower = more
+    # sensitive / trigger-happy, Higher = more conservative.
+    "decision_threshold": 1,
     "theme_primary": "#075E54",
     "theme_secondary": "#25D366",
     "theme_bg": "#ECE5DD",
