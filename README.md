@@ -1,35 +1,5 @@
 # PERSONAL ADVICE — AI Desktop Assistant
 
-A WhatsApp-style desktop AI companion built for a university **Artificial
-Intelligence** course project. It watches how active you are on your
-computer, chats with you, and sends emotion-aware suggestions — using
-a completely self-contained decision engine that you own end-to-end.
-**No third-party AI, no API key, and no internet connection required
-— every decision is made by logic written for this project.**
-
----
-
-## ✨ Features
-
-- **Floating chat bubble** that expands into a full WhatsApp-style chat window
-- **Activity monitoring** — classifies you as `active`, `tired`, or `idle`
-  based on real keyboard/mouse input (idle-time detection)
-- **Own weighted decision engine** — no external AI service of any kind.
-  User messages are scored against a hand-built, weighted keyword lexicon
-  (English + Bengali); the highest-scoring category wins and drives the
-  reply
-- **Short-term conversation memory** — the engine tracks recent categories
-  and adapts (e.g. escalates its response if sadness is detected several
-  times in a row)
-- **Proactive suggestions** — motivational, wellness, and productivity
-  tips sent automatically on a cooldown timer
-- **Idle alert** with a one-click safe shutdown option
-- **Bilingual** — understands and can reply to English or Bengali input
-- **Minimizes to a small floating icon** instead of closing, so it keeps
-  running quietly in the background
-
----
-
 ## 📁 Project Structure
 
 ```
